@@ -1,0 +1,14 @@
+/home/mischa/bin/clion-2023.1.5/bin/cmake/linux/x64/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/home/mischa/bin/clion-2023.1.5/bin/ninja/linux/x64/ninja -G Ninja -S /home/mischa/CLionProjects/untitled -B /home/mischa/CLionProjects/untitled/cmake-build-debug
+-- Shared libraries enabled
+-- GCC13 detected disabling "-Wdangling-reference" in Cpp files as it appears to be a false positive
+-- compiling zlib from sources
+-- Enabled importer formats: AMF 3DS AC ASE ASSBIN B3D BVH COLLADA DXF CSM HMP IRRMESH IQM IRR LWO LWS M3D MD2 MD3 MD5 MDC MDL NFF NDO OFF OBJ OGRE OPENGEX PLY MS3D COB BLEND IFC XGL FBX Q3D Q3BSP RAW SIB SMD STL TERRAGEN 3D X X3D GLTF 3MF MMD
+-- Disabled importer formats:
+-- Enabled exporter formats: OBJ OPENGEX PLY 3DS ASSBIN ASSXML M3D COLLADA FBX STL X X3D GLTF 3MF PBRT ASSJSON STEP
+-- Disabled exporter formats:
+-- Treating all warnings as errors (for assimp library only)
+-- Could NOT find Doxygen (missing: DOXYGEN_EXECUTABLE) 
+-- Using X11 for window creation
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/mischa/CLionProjects/untitled/cmake-build-debug
