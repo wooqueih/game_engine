@@ -1,5 +1,7 @@
 *
 */**
+*/
+cmake*
 !runtime_resources/*
 !src/*
 !vendor/
