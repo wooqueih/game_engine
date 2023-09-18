@@ -1,0 +1,4 @@
+!runtime_resources/*
+!src/*
+!vendor/
+!CMakeLists.txt
