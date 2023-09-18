@@ -18,25 +18,23 @@
 class CameraSystem : public System {
 public:
 	CameraSystem() {};
-	CameraSystem(CameraData* cameraData, Transform* transform) {
+	CameraSystem(std::shared_ptr<CameraData> cameraData, std::shared_ptr<Transform> transform) {
 		m_cameraData = cameraData;
 		m_transform = transform;
 	}
 
+
 	glm::mat4 getViewMatrix() {
-		glm::vec3 target = glm::axis(m_transform->orientation);
-		glm::qua rotatedUp = glm::inverse(m_transform->orientation) * glm::qua(0.0f, 1.0f, 0.0f, 0.0f) * m_transform->orientation;
-		glm::vec3 up = glm::vec3(rotatedUp.x, rotatedUp.y, rotatedUp.z);
-		return glm::lookAt(m_transform->position, m_transform->position + target, up);
+		return glm::lookAt(m_transform->position, m_transform->position + m_transform->getForward(), m_transform->getUp());
 	}
 
 	glm::mat4 getProjectionMatrix() { return glm::perspective(m_cameraData->yFov, m_cameraData->aspectRatio, m_cameraData->nearClippingDistance, m_cameraData->farClippingDistance); }
 
-	inline void setCameraData(CameraData* cameraData) { m_cameraData = cameraData; }
-	inline void setTransform(Transform* transform) { m_transform = transform; }
+	inline void setCameraData(std::shared_ptr<CameraData> cameraData) { m_cameraData = cameraData; }
+	inline void setTransform(std::shared_ptr<Transform> transform) { m_transform = transform; }
 private:
-	CameraData* m_cameraData;
-	Transform* m_transform;
+	std::shared_ptr<CameraData> m_cameraData;
+	std::shared_ptr<Transform> m_transform;
 };
 
 

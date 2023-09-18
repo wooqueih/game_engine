@@ -47,25 +47,25 @@ public:
 	void onUpdate();
 	void onFixedUpdate();
 
-	inline Entity& addChild() { m_children.push_back(Entity()); return m_children[m_children.size()-1]; };
+	inline Entity& addChild() { m_children.push_back(Entity()); return m_children.back(); };
 
-	template<typename T> inline T* addComponent(T component) { m_components.push_back(component); return static_cast<T*>(&m_components[m_components.size()-1]); }
+	template<typename T> inline std::shared_ptr<T> addComponent(T component) { std::shared_ptr<T> ptr = std::make_shared<T>(component); m_components.push_back(ptr); return std::static_pointer_cast<T>(m_components.back()); }
 
-	template<typename T> T* getComponent() {
+	template<typename T> std::shared_ptr<T> getComponent() {
 		for (int i = 0; i < m_components.size(); i++) {
 			if (typeid(T) == typeid(m_components[i])) {
-				return static_cast<T*>(&m_components[i]);
+				return std::static_pointer_cast<T>(m_components[i]);
 			}
 		}
 		return NULL;
 	}
 
-	template<typename T> inline T* addSystem(T system) { m_systems.push_back(system); return static_cast<T*>(&m_systems[m_systems.size()-1]); }
+	template<typename T> inline std::shared_ptr<T> addSystem(T system) { std::shared_ptr<T> ptr = std::make_shared<T>(system); m_systems.push_back(ptr); return std::static_pointer_cast<T>(m_systems.back()); }
 
-	template<typename T> T* getSystem() {
+	template<typename T> std::shared_ptr<T> getSystem() {
 		for (int i = 0; i < m_systems.size(); i++) {
 			if (typeid(T) == typeid(m_systems[i])) {
-				return static_cast<T*>(&m_systems[i]);
+				return std::static_pointer_cast<T>(m_systems[i]);
 			}
 		}
 		return NULL;
@@ -73,8 +73,8 @@ public:
 	std::string m_name;
 private:
 	std::vector<Entity> m_children;
-	std::vector<Component> m_components;
-	std::vector<System> m_systems;
+	std::vector<std::shared_ptr<Component>> m_components;
+	std::vector<std::shared_ptr<System>> m_systems;
 };
 
 

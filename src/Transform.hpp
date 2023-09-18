@@ -14,7 +14,7 @@
 
 struct Transform: Component {
 	glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
-	glm::quat orientation = glm::quat(0.0f, 0.0f, 0.0f, 1.0f);
+	glm::quat orientation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
 	glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
 
 	inline glm::vec3 getEulerRotation() {
@@ -24,10 +24,42 @@ struct Transform: Component {
 				atan2(2*(orientation.w*orientation.z + orientation.x*orientation.y), 1 - 2*(orientation.y*orientation.y + orientation.z*orientation.z))
 		);
 	}
+
 	inline void rotate(float angle, glm::vec3 axis) {
 		glm::quat rotation = glm::angleAxis(angle, axis);
-		orientation = rotation * orientation;
+		orientation =  rotation * orientation;
 	}
+
+	inline glm::vec3 getForward() {
+		glm::qua rotatedForward = glm::quat(
+				orientation.w,
+				orientation.x * -1,
+				orientation.y * -1,
+				orientation.z * -1
+		) * glm::qua(0.0f, 0.0f, 0.0f, 1.0f) * orientation;
+		return glm::vec3(rotatedForward.x, rotatedForward.y, rotatedForward.z);
+	}
+
+	inline glm::vec3 getUp() {
+		glm::qua rotatedUp = glm::quat(
+				orientation.w,
+				orientation.x * -1,
+				orientation.y * -1,
+				orientation.z * -1
+		) * glm::qua(0.0f, 0.0f, 1.0f, 0.0f) * orientation;
+		return glm::vec3(rotatedUp.x, rotatedUp.y, rotatedUp.z);
+	}
+
+	inline glm::vec3 getRight() {
+		glm::qua rotatedRight = glm::quat(
+				orientation.w,
+				orientation.x * -1,
+				orientation.y * -1,
+				orientation.z * -1
+		) * glm::qua(0.0f, 1.0f, 0.0f, 0.0f) * orientation;
+		return glm::vec3(rotatedRight.x, rotatedRight.y, rotatedRight.z);
+	}
+
 	inline glm::mat4 getMatrix() {
 		glm::mat4 scaling = glm::scale(glm::mat4(1.0f), scale);
 		glm::mat4 rotation = toMat4(orientation);

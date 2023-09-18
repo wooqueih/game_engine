@@ -34,7 +34,7 @@ int main() {
 	app.init(1000, 1000, "grass");
 	input.init(app.getWindow());
 
-	/*IMGUI_CHECKVERSION();
+	IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
@@ -46,7 +46,7 @@ int main() {
 
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(app.getWindow(), true);
-    ImGui_ImplOpenGL3_Init();*/
+    ImGui_ImplOpenGL3_Init();
 
 	stbi_set_flip_vertically_on_load(true);
 
@@ -59,26 +59,24 @@ int main() {
 	camera.m_position = glm::vec3(0.0f, 3.0f, 6.0f);*/
 
 	Scene mainScene;
-	Entity ente = mainScene.getSceneEntity().addChild();
-	ente.addComponent(Model("./models/ground.obj"));
-	Transform* trans = ente.addComponent(Transform());
+	Entity ground = mainScene.getSceneEntity().addChild();
+	std::shared_ptr<Model> plane = ground.addComponent(Model("./models/ground_plane.glb"));
+	std::shared_ptr<Transform> trans = ground.addComponent(Transform());
 	trans->scale = glm::vec3(1.0f, 1.0f, 1.0f);
-	trans->rotate(glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	trans->position = glm::vec3(10.0f, 0.0f, 1.0f);
+	trans->rotate(glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	trans->position = glm::vec3(-1.0f, 0.0f, 0.0f);
 	glm::axis(trans->orientation);
 
-	CameraData* cameraData = ente.addComponent(CameraData());
+	Entity player = mainScene.getSceneEntity().addChild();
+	std::shared_ptr<Transform> playerTrans = player.addComponent(Transform());
+	std::shared_ptr<CameraData> cameraData = player.addComponent(CameraData());
 	cameraData->aspectRatio = ((float)app.getWindowWidth()) / ((float)app.getWindowHeight());
 	cameraData->yFov = glm::radians(80.0f);
 	cameraData->nearClippingDistance = 0.01f;
 	cameraData->farClippingDistance = 10000.0f;
 
-	CameraSystem* cameraSystem = ente.addSystem(CameraSystem(cameraData, trans));
+	std::shared_ptr<CameraSystem> cameraSystem = player.addSystem(CameraSystem(cameraData, playerTrans));
 
-	//mainScene.setActiveCamera(ente->addComponent(cameraData));
-
-	//mainScene.getSceneEntity().addChild(Entity());
-	//mainScene.setActiveCamera(camera);
 	bool active;
 
 	double lastFrameTime = 0.0f;
@@ -94,18 +92,22 @@ int main() {
 
         input.process();
 
-		/*ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
 		ImGuiIO& io = ImGui::GetIO();
-		io.FontGlobalScale = 3;*/
+		io.FontGlobalScale = 3;
 		//ImFont* font1 = io.Fonts->AddFontFromFileTTF("/home/mischa/CLionProjects/untitled/cmake-build-debug/fonts/notosans.ttf", 26);
 
 		float speed = 5.0f * deltaTimef;
-		trans->position += input.m_wasdMovement.z * speed * glm::axis(trans->orientation);
-		trans->position += input.m_wasdMovement.x * speed * glm::normalize(glm::cross(glm::axis(trans->orientation), glm::vec3(0.0f, 1.0f, 0.0f)));
-		trans->rotate(/*input.m_mouseMovement.x*deltaTimef, */input.m_mouseMovement.y*deltaTimef, glm::vec3(0.0f, 1.0f, 0.0f));
+		playerTrans->position += input.m_wasdMovement.z * speed * playerTrans->getForward();
+		playerTrans->position -= input.m_wasdMovement.x * speed * playerTrans->getRight();
+		//playerTrans->rotate(input.m_mouseMovement.y*deltaTimef, glm::vec3(1.0f, 0.0f, 0.0f));
+		float rotY = input.m_mouseMovement.x*deltaTimef * input.m_mouseSensitivity;
+		float rotX = input.m_mouseMovement.y*deltaTimef * input.m_mouseSensitivity;
+		playerTrans->rotate(rotX, glm::vec3(1.0f, 0.0f, 0.0f));
+		playerTrans->rotate(rotY, glm::vec3(0.0f, 1.0f, 0.0f));
 
 		glClearColor(0.2f, 0.2f, 0.8f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -118,11 +120,10 @@ int main() {
 
 		glm::mat4 model = trans->getMatrix();
 		shader.setUniformMatrix4fv("model", glm::value_ptr(model));
-		Model* plane = ente.getComponent<Model>();
 
 		plane->draw(shader);
 
-		/*ImGui::Begin("Test", &active, ImGuiWindowFlags_MenuBar);
+		ImGui::Begin("Test", &active, ImGuiWindowFlags_MenuBar);
 		ImGui::SetWindowSize(ImVec2(0.0f, 0.0f));
 
 		ImGui::Text("%4.2f fps", 1/deltaTimef);
@@ -130,18 +131,20 @@ int main() {
 		ImGui::InputFloat3("Position", glm::value_ptr(trans->position));
 		ImGui::InputFloat4("Rotation", glm::value_ptr(trans->orientation));
 		ImGui::InputFloat3("Scale", glm::value_ptr(trans->scale));
+		auto tmp = (playerTrans->getEulerRotation() / M_PIf) * 360.0f;
+		ImGui::InputFloat3("Camera rotation", glm::value_ptr(tmp));
 
 		ImGui::End();
 
 		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());*/
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(app.getWindow());
         glfwPollEvents();
     }
-	/*ImGui_ImplGlfw_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
 	ImGui_ImplOpenGL3_Shutdown();
-	ImGui::DestroyContext();*/
+	ImGui::DestroyContext();
 
     glfwTerminate();
     return 0;

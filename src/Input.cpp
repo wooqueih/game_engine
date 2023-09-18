@@ -15,7 +15,7 @@ void Input::bindWindow(GLFWwindow* window) {
 
 void Input::init(GLFWwindow* window) {
 	m_window = window;
-	m_mouseSensitivity = 5.0f;
+	m_mouseSensitivity = 0.5f;
 	double xPos, yPos;
 	glfwGetCursorPos(m_window, &xPos, &yPos);
 	m_lastMousePosition = glm::vec2(xPos, yPos);
