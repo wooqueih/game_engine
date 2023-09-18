@@ -1,8 +1,7 @@
 *
-*/**
 */
 cmake*
-!runtime_resources/*
-!src/*
+!runtime_resources/
+!src/
 !vendor/
 !CMakeLists.txt
