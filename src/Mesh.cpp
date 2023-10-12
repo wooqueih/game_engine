@@ -41,7 +41,9 @@ void Mesh::Draw(Shader &shader)
 {
 	unsigned int diffuseNr = 1;
 	unsigned int specularNr = 1;
+	int count;
 	for(unsigned int i = 0; i < m_textures.size(); i++) {
+		count = i;
 		glActiveTexture(GL_TEXTURE0 + i); // activate proper texture unit before binding
 		// retrieve texture number (the N in diffuse_textureN)
 		std::string number;
@@ -56,6 +58,22 @@ void Mesh::Draw(Shader &shader)
 
 		shader.setUniform1i(("material." + name + number).c_str(), i);
 		glBindTexture(GL_TEXTURE_2D, m_textures[i].id);
+	}
+	while (diffuseNr < 9) {
+		glActiveTexture(GL_TEXTURE0 + count); // activate proper texture unit before binding
+		shader.setUniform1i(("material.texture_diffuse" + std::to_string(diffuseNr)).c_str(), count);
+		glBindTexture(GL_TEXTURE_2D, Texture::white());
+
+		diffuseNr++;
+		count++;
+	}
+	while (specularNr < 9) {
+		glActiveTexture(GL_TEXTURE0 + count); // activate proper texture unit before binding
+		shader.setUniform1i(("material.texture_diffuse" + std::to_string(specularNr)).c_str(), count);
+		glBindTexture(GL_TEXTURE_2D, Texture::white());
+
+		specularNr++;
+		count++;
 	}
 	glActiveTexture(GL_TEXTURE0);
 

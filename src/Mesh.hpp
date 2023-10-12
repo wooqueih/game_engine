@@ -23,6 +23,28 @@ struct Texture {
 	unsigned int id;
 	std::string type;
 	std::string path;
+
+	static unsigned int white() {
+		static Texture tex;
+		if (tex.id) {
+			return tex.id;
+		}
+
+		glGenTextures(1, &tex.id);
+
+		GLenum format = GL_RGB;
+		static float whiteTexture[] = {1.0f, 1.0f, 1.0f, 1.0f};
+
+		glBindTexture(GL_TEXTURE_2D, tex.id);
+		glTexImage2D(GL_TEXTURE_2D, 0, format, 1, 1, 0, format, GL_UNSIGNED_BYTE, whiteTexture);
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		return tex.id;
+	}
 };
 
 class Mesh {
