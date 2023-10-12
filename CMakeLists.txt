@@ -3,7 +3,7 @@ project(touching_grass)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(touching_grass src/main.cpp src/Input.cpp src/Application.cpp src/Mesh.cpp src/Model.cpp src/Shader.cpp src/Entity.cpp src/Entity.hpp src/Component.hpp src/Event.cpp src/Event.hpp src/Scene.cpp src/Scene.hpp src/Id.cpp src/Id.hpp src/Transform.hpp src/CameraData.hpp src/System.hpp)
+add_executable(touching_grass src/main.cpp src/Input.cpp src/Application.cpp src/Mesh.cpp src/Model.cpp src/Shader.cpp src/Entity.cpp src/Entity.hpp src/Component.hpp src/Event.cpp src/Event.hpp src/Scene.cpp src/Scene.hpp src/Id.cpp src/Id.hpp src/Transform.hpp src/CameraData.hpp src/System.hpp src/CollisionBox.hpp)
 
 add_custom_target(copy_runtime_resources ALL COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/runtime_resources ${CMAKE_BINARY_DIR})
 add_dependencies(touching_grass copy_runtime_resources)

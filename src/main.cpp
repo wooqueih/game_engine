@@ -55,20 +55,16 @@ int main() {
 
 	glEnable(GL_DEPTH_TEST);
 
-	/*Camera camera(glm::perspective(glm::radians(80.0f), ((float)app.getWindowWidth()) / ((float)app.getWindowHeight()), 0.01f, 10000.0f));
-	camera.m_position = glm::vec3(0.0f, 3.0f, 6.0f);*/
-
 	Scene mainScene;
+
 	Entity ground = mainScene.getSceneEntity().addChild();
-	std::shared_ptr<Model> plane = ground.addComponent(Model("./models/ground_plane.glb"));
+	std::shared_ptr<Model> plane = ground.addComponent(Model("./models/tex.obj"));
 	std::shared_ptr<Transform> trans = ground.addComponent(Transform());
 	trans->scale = glm::vec3(1.0f, 1.0f, 1.0f);
-	trans->rotate(glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	trans->position = glm::vec3(-1.0f, 0.0f, 0.0f);
-	glm::axis(trans->orientation);
 
 	Entity player = mainScene.getSceneEntity().addChild();
 	std::shared_ptr<Transform> playerTrans = player.addComponent(Transform());
+	playerTrans->position = glm::vec3(0.0f, 1.0f, 0.0f);
 	std::shared_ptr<CameraData> cameraData = player.addComponent(CameraData());
 	cameraData->aspectRatio = ((float)app.getWindowWidth()) / ((float)app.getWindowHeight());
 	cameraData->yFov = glm::radians(80.0f);
@@ -78,6 +74,9 @@ int main() {
 	std::shared_ptr<CameraSystem> cameraSystem = player.addSystem(CameraSystem(cameraData, playerTrans));
 
 	bool active;
+
+	float rotY = 0.0f;
+	float rotX = 0.0f;
 
 	double lastFrameTime = 0.0f;
 	double thisFrameTime;
@@ -103,11 +102,17 @@ int main() {
 		float speed = 5.0f * deltaTimef;
 		playerTrans->position += input.m_wasdMovement.z * speed * playerTrans->getForward();
 		playerTrans->position -= input.m_wasdMovement.x * speed * playerTrans->getRight();
-		//playerTrans->rotate(input.m_mouseMovement.y*deltaTimef, glm::vec3(1.0f, 0.0f, 0.0f));
-		float rotY = input.m_mouseMovement.x*deltaTimef * input.m_mouseSensitivity;
-		float rotX = input.m_mouseMovement.y*deltaTimef * input.m_mouseSensitivity;
-		playerTrans->rotate(rotX, glm::vec3(1.0f, 0.0f, 0.0f));
+
+		rotY += input.m_mouseMovement.x * deltaTimef * input.m_mouseSensitivity;
+		rotX += input.m_mouseMovement.y * deltaTimef * input.m_mouseSensitivity;
+		if (rotX > M_PI_2f) {
+			rotX = M_PI_2f;
+		} else if (rotX < -1 * M_PI_2f) {
+			rotX = -1 * M_PI_2f;
+		}
+		playerTrans->orientation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
 		playerTrans->rotate(rotY, glm::vec3(0.0f, 1.0f, 0.0f));
+		playerTrans->rotate(rotX, glm::vec3(1.0f, 0.0f, 0.0f));
 
 		glClearColor(0.2f, 0.2f, 0.8f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -120,6 +125,25 @@ int main() {
 
 		glm::mat4 model = trans->getMatrix();
 		shader.setUniformMatrix4fv("model", glm::value_ptr(model));
+
+		struct Light {
+			glm::vec3 position;
+			glm::vec3 ambient;
+			glm::vec3 diffuse;
+			glm::vec3 specular;
+		};
+
+		Light light;
+		light.position = glm::vec3(0.0f, 6.0f, 0.0f);
+		shader.setUniform3fv("light.position", glm::value_ptr(light.position));
+		light.ambient = glm::vec3(1.0f, 1.0f, 1.0f);
+		shader.setUniform3fv("light.ambient", glm::value_ptr(light.ambient));
+		light.diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
+		shader.setUniform3fv("light.diffuse", glm::value_ptr(light.diffuse));
+		light.specular = glm::vec3(1.0f, 1.0f, 1.0f);
+		shader.setUniform3fv("light.specular", glm::value_ptr(light.specular));
+
+		shader.setUniform3fv("viewPos", glm::value_ptr(trans->position));
 
 		plane->draw(shader);
 
